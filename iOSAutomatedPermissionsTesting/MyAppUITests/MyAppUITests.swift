@@ -21,16 +21,32 @@ class MyAppUITests: XCTestCase {
     XCUIApplication().launch()
 
     // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    Springboard.deleteMyApp()
   }
 
   override func tearDown() {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
+    Springboard.deleteMyApp()
     super.tearDown()
   }
 
-  func testA() {
-
+  func testAllowingNotifications() {
+    requestNotificationsPermissionsWith(user: .allowing)
+    // verify the state
+    Springboard.turnNotifications(.off)
+    // verify the state
   }
 
+  func testDisallowingNotifications() {
+    requestNotificationsPermissionsWith(user: .disallowing)
+    // verify the state
+    Springboard.turnNotifications(.on)
+    // verify the state
+  }
+
+  private enum UserResponse {
+    case allowing, disallowing
+  }
+
+  private func requestNotificationsPermissionsWith(user response: UserResponse) {
+  }
 }
