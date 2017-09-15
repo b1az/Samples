@@ -10,6 +10,8 @@ import XCTest
 
 final class Springboard {
   static let springboard = XCUIApplication(privateWithPath: nil, bundleID: "com.apple.springboard")!
+  static let settings = XCUIApplication(privateWithPath: nil, bundleID: "com.apple.Preferences")!
+  static let settingsIcon = springboard.icons["Settings"]
 
   class func deleteMyApp() {
     XCUIApplication().terminate()
@@ -41,6 +43,55 @@ final class Springboard {
       .components(separatedBy: "/").last!
       .components(separatedBy: ".").dropLast()
     return Array(appName).first!
+  }
+
+  private class func openMyAppSectionInSettings() {
+    openSettings()
+
+    let appCell = settings.tables.staticTexts[myAppName]
+
+    func scrollToSettingsBottom() {
+      // Will do even on the heighest device, as long as there aren't too many apps in Settings
+      settings.swipeUp()
+      settings.swipeUp()
+    }
+
+    func scrollToSettingsBottom_shouldBeWorkingAlternative() {
+      // [Xcode 8.3.3, iOS 10.3]
+      // For some reason, below approach errors out with
+      // "Multiple matches found for "MyApp" StaticText."
+      for _ in 1...10 where !appCell.isHittable {
+        settings.swipeUp()
+      }
+    }
+
+    func scrollToSettingsBottom_alternative2() {
+      let tableBottom = settingsTable.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 1.0))
+      let scrollVector = CGVector(dx: 0.0, dy: -30.0)
+      tableBottom.press(forDuration: 0.5, thenDragTo: tableBottom.withOffset(scrollVector))
+    }
+
+    scrollToSettingsBottom()
+    appCell.tap()
+  }
+
+  private class func openSettings() {
+    // Make sure home screen is frontmost
+    XCUIApplication().terminate()
+
+    // Go to SpringBoard's first screen
+    XCUIDevice.shared().press(.home)
+    Thread.sleep(forTimeInterval: 0.5)
+    XCTAssert(settingsIcon.isHittable)
+
+    // Launch Settings.app from a known state
+    settings.terminate()
+
+    settingsIcon.tap()
+  }
+
+  private class var settingsTable: XCUIElement {
+    return settings.tables.element(boundBy: 0)
   }
 
 }
