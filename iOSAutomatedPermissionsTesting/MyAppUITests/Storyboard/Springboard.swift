@@ -36,6 +36,28 @@ final class Springboard {
     XCUIDevice.shared().press(.home)
   }
 
+  enum NotificationsState {
+    case on, off
+  }
+
+  class func turnNotifications(_ desiredState: NotificationsState) {
+    openMyAppSectionInSettings()
+    settingsTable.cells.staticTexts["Notifications"].tap()
+
+    var currentState: NotificationsState {
+      let soundsCell = settingsTable.cells.staticTexts["Sounds"]
+      return soundsCell.exists && soundsCell.isHittable
+        ? .on
+        : .off
+    }
+
+    if (desiredState == .on && currentState == .off)
+      || (desiredState == .off && currentState == .on) {
+      // Tap the "Allow Notifications" switch
+      settings.switches.element(boundBy: 0).tap()
+    }
+  }
+
   private class var myAppName: String {
     // XCUIApplication().path example:
     // "/Users/{me}/Library/Developer/Xcode/DerivedData/MyApp-{someID}/Build/Products/Debug-iphonesimulator/MyApp.app"
