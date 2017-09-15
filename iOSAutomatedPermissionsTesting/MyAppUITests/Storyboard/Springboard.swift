@@ -53,8 +53,8 @@ final class Springboard {
 
     if (desiredState == .on && currentState == .off)
       || (desiredState == .off && currentState == .on) {
-      // Tap the "Allow Notifications" switch
-      settings.switches.element(boundBy: 0).tap()
+      let allowNotificationsSwitch = settings.switches.element(boundBy: 0)
+      allowNotificationsSwitch.tap()
     }
   }
 
